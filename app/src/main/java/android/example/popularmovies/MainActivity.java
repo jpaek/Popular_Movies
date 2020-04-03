@@ -17,8 +17,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.GridLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -32,8 +34,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private MovieAdapter mMovieAdapter;
 
     private TextView mErrorMessageDisplay;
-
     private ProgressBar mLoadingIndicator;
+
+    private final String POPULAR = "popular";
+    private final String TOP_RATED = "top_rated";
 
 
     @Override
@@ -59,9 +63,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mRecyclerView.setAdapter(mMovieAdapter);
 
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
-
-        /* Once all of our views are setup, we can load the weather data. */
-        loadMovieData("popular");
+        loadMovieData(POPULAR);
     }
 
     @Override
@@ -76,60 +78,38 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         switch (item.getItemId()) {
             case R.id.action_popular:
-                loadMovieData("popular");
+                loadMovieData(POPULAR);
                 return true;
             case R.id.action_top_rated:
-                loadMovieData("top_rated");
+                loadMovieData(TOP_RATED);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    /**
-     * This method will get the user's preferred location for weather, and then tell some
-     * background method to get the weather data in the background.
-     */
     private void loadMovieData(String type) {
         showMovieDataView();
 
         new FetchMovieListTask().execute(type);
     }
 
-    /**
-     * This method is overridden by our MainActivity class in order to handle RecyclerView item
-     * clicks.
-     *
-     * @param movie The movie that was clicked
-     */
     @Override
     public void onClick(Movie movie) {
         Context context = this;
-//        Class destinationClass = DetailActivity.class;
-//        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-//        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, weatherForDay);
-//        startActivity(intentToStartDetailActivity);
+        Class destinationClass = DetailActivity.class;
+        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
+        intentToStartDetailActivity.putExtra("Movie", movie);
+        Log.v(TAG, "Selected a movie: " + movie.title);
+        startActivity(intentToStartDetailActivity);
     }
 
-    /**
-     * This method will make the View for the movie data visible and
-     * hide the error message.
-     * <p>
-     * Since it is okay to redundantly set the visibility of a View, we don't
-     * need to check whether each view is currently visible or invisible.
-     */
+
     private void showMovieDataView() {
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * This method will make the error message visible and hide the weather
-     * View.
-     * <p>
-     * Since it is okay to redundantly set the visibility of a View, we don't
-     * need to check whether each view is currently visible or invisible.
-     */
     private void showErrorMessage() {
         /* First, hide the currently visible data */
         mRecyclerView.setVisibility(View.INVISIBLE);

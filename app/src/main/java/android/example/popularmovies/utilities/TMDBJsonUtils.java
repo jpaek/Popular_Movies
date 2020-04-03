@@ -33,12 +33,10 @@ public class TMDBJsonUtils {
         final String STATUS_CODE = "status_code";
         final String STATUS_MESSAGE = "status_message";
 
-        /* String array to hold each day's weather String */
         Movie[] parsedMovieData = null;
 
         JSONObject movieJson = new JSONObject(movieJsonStr);
 
-        /* Is there an error? */
         if (movieJson.has(STATUS_CODE)) {
             int errorCode = movieJson.getInt(STATUS_CODE);
 
@@ -58,7 +56,6 @@ public class TMDBJsonUtils {
             String synopsis;
 
 
-            /* Get the JSON object representing the day */
             JSONObject movie = movieArray.getJSONObject(i);
             title = movie.getString(TITLE);
             posterPath = movie.getString(POSTER_PATH);
