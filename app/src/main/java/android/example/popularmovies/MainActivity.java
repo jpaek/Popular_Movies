@@ -12,6 +12,7 @@ import android.example.popularmovies.utilities.NetworkUtils;
 import android.example.popularmovies.utilities.TMDBJsonUtils;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
 
         GridLayoutManager layoutManager
-                = new GridLayoutManager(this, 3);
+                = new GridLayoutManager(this, numberOfColumns());
 
         mRecyclerView.setLayoutManager(layoutManager);
 
@@ -64,6 +65,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         loadMovieData(POPULAR);
+    }
+
+    private int numberOfColumns() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        // You can change this divider to adjust the size of the item
+        int widthDivider = 200;
+        int width = displayMetrics.widthPixels;
+        int nColumns = width / widthDivider;
+        if (nColumns < 2) return 2; //to keep the grid aspect
+        return nColumns;
     }
 
     @Override
