@@ -55,6 +55,40 @@ public final class NetworkUtils {
         return url;
     }
 
+    public static URL buildTrailerUtrl(int id) {
+        String trailerUrl = API_URL + id + "/videos";
+        Uri builtUri = Uri.parse(trailerUrl).buildUpon()
+                .appendQueryParameter(API_PARAM, BuildConfig.TMDB_API_KEY)
+                .appendQueryParameter(LANGUAGE_PARAM, language)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
+    public static URL buildReviewUrl(int id) {
+        String trailerUrl = API_URL + id + "/reviews";
+        Uri builtUri = Uri.parse(trailerUrl).buildUpon()
+                .appendQueryParameter(API_PARAM, BuildConfig.TMDB_API_KEY)
+                .appendQueryParameter(LANGUAGE_PARAM, language)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
 
     /**
      * This method returns the entire result from the HTTP response.

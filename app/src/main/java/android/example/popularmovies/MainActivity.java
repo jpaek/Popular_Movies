@@ -1,12 +1,16 @@
 package android.example.popularmovies;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.example.popularmovies.database.AppDatabase;
+import android.example.popularmovies.database.FavoriteEntry;
 import android.example.popularmovies.utilities.Movie;
 import android.example.popularmovies.utilities.NetworkUtils;
 import android.example.popularmovies.utilities.TMDBJsonUtils;
@@ -26,6 +30,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
 
@@ -33,9 +38,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
+    private FavoriteAdapter mFavoriteAdapter;
 
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
+    private AppDatabase mDatabase;
 
     private final String POPULAR = "popular";
     private final String TOP_RATED = "top_rated";
@@ -60,11 +67,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
 
         mMovieAdapter = new MovieAdapter(this);
-
-        mRecyclerView.setAdapter(mMovieAdapter);
+        mFavoriteAdapter = new FavoriteAdapter(this);
 
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         loadMovieData(POPULAR);
+        mDatabase = AppDatabase.getInstance(getApplicationContext());
+        setupViewModel();
     }
 
     private int numberOfColumns() {
@@ -95,6 +103,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             case R.id.action_top_rated:
                 loadMovieData(TOP_RATED);
                 return true;
+            case R.id.action_favorite:
+                loadFavorite();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -102,8 +113,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private void loadMovieData(String type) {
         showMovieDataView();
-
+        mRecyclerView.setAdapter(mMovieAdapter);
         new FetchMovieListTask().execute(type);
+    }
+
+    private void loadFavorite() {
+        showMovieDataView();
+        Log.v(TAG, "Show favorites");
+        mRecyclerView.setAdapter(mFavoriteAdapter);
     }
 
     @Override
@@ -127,6 +144,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mRecyclerView.setVisibility(View.INVISIBLE);
         /* Then, show the error */
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
+    }
+
+    private void setupViewModel() {
+        FavoriteViewModel viewModel = ViewModelProviders.of(this).get(FavoriteViewModel.class);
+        viewModel.getFavorites().observe(this, new Observer<List<FavoriteEntry>>() {
+            @Override
+            public void onChanged(List<FavoriteEntry> favoriteEntries) {
+                Log.v(TAG, "ID: " + favoriteEntries.get(0).getId());
+                mFavoriteAdapter.setFavorites(favoriteEntries);
+            }
+        });
     }
 
     public class FetchMovieListTask extends AsyncTask<String, Void, Movie[]> {

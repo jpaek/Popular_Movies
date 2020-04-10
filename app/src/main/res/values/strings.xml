@@ -3,4 +3,9 @@
     <string name="error_message">Error retrieving result from TMDb</string>
     <string name="action_popular">Popular</string>
     <string name="action_top_rated">Top Rated</string>
+    <string name="action_favorite">Favorite</string>
+    <string name="review_section_title">Reviews</string>
+    <string name="trailer_section_title">Trailers</string>
+    <string name="favorite_on">Favorite</string>
+    <string name="favorite_off">Not Favorite</string>
 </resources>
